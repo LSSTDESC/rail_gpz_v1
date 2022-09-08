@@ -6,7 +6,7 @@ https://github.com/pwhatfield/GPz_py3
 from ceci.config import StageParameter as Param
 from rail.estimation.estimator import CatEstimator, CatInformer
 from rail.core.utils import RAILDIR
-import GPz
+from .GPz import *
 import qp
 
 
@@ -43,11 +43,11 @@ def _prepare_data(data_dict, bands, err_bands, nondet_val, maglims, logflag):
 
 class Inform_GPz_v1(CatInformer):
     """Inform stage for GPz_v1
-    Parameters:
-    -----------
+    Parameters
+    ----------
 
-    Returns:
-    --------
+    Returns
+    -------
     gpz_model: model
       model file containing the trained GPz model to be used in estimate
       stage
@@ -64,7 +64,7 @@ class Inform_GPz_v1(CatInformer):
                           seed=Param(int, 0, msg="Random number seed for NN training"),
                           bands=Param(list, def_bands, msg="bands to use in estimation"),
                           err_bands=Param(list, def_err_bands, msg="error column names to use in estimation"),
-                          redshift_col=Param(str, "redshift", msge="name for redshift column"),
+                          redshift_col=Param(str, "redshift", msg="name for redshift column"),
                           gpz_method=Param(str, "VC", msg="method to be used in GPz, options are 'GL', 'VL', 'GD', 'VD', 'GC', and 'VC'"),
                           n_basis=Param(int, 50, msg="number of basis functions used"),
                           learn_jointly=Param(bool, True, msg="if True, jointly learns prior linear mean function"),
@@ -128,7 +128,7 @@ class GPz_v1(CatEstimator):
     """GPz_v1 estimator
     """
     name = "GPz_v1"
-
+    config_options = CatEstimator.config_options.copy()
     config_options.update(zmin=Param(float, 0.0, msg="min z"),
                           zmax=Param(float, 3.0, msg="max_z"),
                           nzbins=Param(int, 301, msg="num z bins"),
@@ -136,7 +136,7 @@ class GPz_v1(CatEstimator):
                           mag_lims=Param(list, def_maglims, msg="magnitude limits for each band"),
                           bands=Param(list, def_bands, msg="bands to use in estimation"),
                           err_bands=Param(list, def_err_bands, msg="error column names to use in estimation"),
-                          redshift_col=Param(str, "redshift", msge="name for redshift column"),
+                          redshift_col=Param(str, "redshift", msg="name for redshift column"),
                           log_errors=Param(bool, True, msg="if true, take log of magnitude errors"))
 
     def __init__(self, args, comm=None):
