@@ -3,6 +3,7 @@ RAIL wrapping of Peter Hatfield's version of GPz, which
 can be found at:
 https://github.com/pwhatfield/GPz_py3
 """
+import numpy as np
 from ceci.config import StageParameter as Param
 from rail.estimation.estimator import CatEstimator, CatInformer
 from rail.core.utils import RAILDIR
@@ -29,8 +30,8 @@ def _prepare_data(data_dict, bands, err_bands, nondet_val, maglims, logflag):
     """
     numbands = len(bands)
     totrows = len(data_dict[bands[0]])
-    data = np.empty([2*numrows, totrows])
-    for i, (band, eband, lim) in enumerate(zip(bands,  err_bands, maglims)):
+    data = np.empty([totrows, 2*numbands])
+    for i, (band, eband, lim) in enumerate(zip(bands,  err_bands, maglims.values())):
         data[:, i] = data_dict[band]
         mask = np.isclose(data_dict[band], nondet_val)
         data[:, i][mask] = lim
@@ -58,7 +59,7 @@ class Inform_GPz_v1(CatInformer):
                           zmax=Param(float, 3.0, msg="max_z"),
                           nzbins=Param(int, 301, msg="num z bins"),
                           nondetect_val=Param(float, 99.0, msg="value to be replaced with magnitude limit for non detects"),
-                          mag_lims=Param(list, def_maglims, msg="magnitude limits for each band"),
+                          mag_lims=Param(dict, def_maglims, msg="magnitude limits for each band"),
                           trainfrac=Param(float, 0.75,
                                           msg="fraction of training data used to make tree, rest used to set best sigma"),
                           seed=Param(int, 0, msg="Random number seed for NN training"),
@@ -95,25 +96,27 @@ class Inform_GPz_v1(CatInformer):
                                     self.config.nondetect_val, self.config.mag_lims,
                                     self.config.log_errors)
 
-        sz = training_data[self.config.redshift_col]
+        sz = np.expand_dims(training_data[self.config.redshift_col], -1)
         # need permutation mask to define training vs validation
-        ngal = input_array.shape[1]
-        ntrain = ngal * self.config.trainfrac
+        ngal = input_array.shape[0]
+        print(f"ngal: {ngal}")
+        ntrain = int(ngal * self.config.trainfrac)
         randvec = np.random.permutation(ngal)
         train_mask = np.zeros(ngal, dtype=bool)
+        val_mask = np.zeros(ngal, dtype=bool)
         train_mask[randvec[:ntrain]] = True
         val_mask[randvec[ntrain:]] = True
         
 
         # get weights for cost sensitive learning
-        omega_weights = GPz.getOmega(sz, method=self.config.csl_method)
+        omega_weights = getOmega(sz, method=self.config.csl_method)
 
         # initialize model
-        model = GPz.GP(self.config.n_basis,
-                       method=self.config.gpz_method,
-                       joint=self.config.learn_jointly,
-                       heteroscedastic=self.config.hetero_noise,
-                       decorrelate=self.config.pca_decorrelate)
+        model = GP(self.config.n_basis,
+                   method=self.config.gpz_method,
+                   joint=self.config.learn_jointly,
+                   heteroscedastic=self.config.hetero_noise,
+                   decorrelate=self.config.pca_decorrelate)
 
         print("training model...")
         model.train(input_array, sz, omega=omega_weights, training=train_mask,
@@ -133,7 +136,7 @@ class GPz_v1(CatEstimator):
                           zmax=Param(float, 3.0, msg="max_z"),
                           nzbins=Param(int, 301, msg="num z bins"),
                           nondetect_val=Param(float, 99.0, msg="value to be replaced with magnitude limit for non detects"),
-                          mag_lims=Param(list, def_maglims, msg="magnitude limits for each band"),
+                          mag_lims=Param(dict, def_maglims, msg="magnitude limits for each band"),
                           bands=Param(list, def_bands, msg="bands to use in estimation"),
                           err_bands=Param(list, def_err_bands, msg="error column names to use in estimation"),
                           redshift_col=Param(str, "redshift", msg="name for redshift column"),
