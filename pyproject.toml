@@ -44,7 +44,7 @@ write_to = "src/rail/estimation/algos/gpz_version/_version.py"
 
 [tool.coverage.run]
 source = ["src/rail"]
-branch = true
+branch = false
 
 [tool.coverage.report]
 show_missing = true
@@ -104,8 +104,7 @@ line_length = 110
 
 [tool.pytest.ini_options]
 addopts = [
-    "--cov=rail.estimation.algos.bpz_lite",
-    "--cov-branch",
+    "--cov=rail.estimation.algos.gpz_v1",
     "--cov-report=html"
 ]
 flake8-ignore = "E203"

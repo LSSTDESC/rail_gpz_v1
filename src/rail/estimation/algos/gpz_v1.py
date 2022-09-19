@@ -6,8 +6,7 @@ https://github.com/pwhatfield/GPz_py3
 import numpy as np
 from ceci.config import StageParameter as Param
 from rail.estimation.estimator import CatEstimator, CatInformer
-from rail.core.utils import RAILDIR
-from .GPz import *
+from .GPz import GP, getOmega
 import qp
 
 
@@ -30,17 +29,18 @@ def _prepare_data(data_dict, bands, err_bands, nondet_val, maglims, logflag):
     """
     numbands = len(bands)
     totrows = len(data_dict[bands[0]])
-    data = np.empty([totrows, 2*numbands])
-    for i, (band, eband, lim) in enumerate(zip(bands,  err_bands, maglims.values())):
+    data = np.empty([totrows, 2 * numbands])
+    for i, (band, eband, lim) in enumerate(zip(bands, err_bands, maglims.values())):
         data[:, i] = data_dict[band]
         mask = np.isclose(data_dict[band], nondet_val)
         data[:, i][mask] = lim
         if logflag:
             data[:, numbands + i] = np.log(data_dict[eband])
-        else:
+        else:  # pragma: no cover
             data[:, numbands + i] = data_dict[eband]
         data[:, numbands + i][mask] = 1.0
     return data
+
 
 class Inform_GPz_v1(CatInformer):
     """Inform stage for GPz_v1
@@ -55,10 +55,7 @@ class Inform_GPz_v1(CatInformer):
     """
     name = "Inform_GPz_v1"
     config_options = CatInformer.config_options.copy()
-    config_options.update(zmin=Param(float, 0.0, msg="min z"),
-                          zmax=Param(float, 3.0, msg="max_z"),
-                          nzbins=Param(int, 301, msg="num z bins"),
-                          nondetect_val=Param(float, 99.0, msg="value to be replaced with magnitude limit for non detects"),
+    config_options.update(nondetect_val=Param(float, 99.0, msg="value to be replaced with magnitude limit for non detects"),
                           mag_lims=Param(dict, def_maglims, msg="magnitude limits for each band"),
                           trainfrac=Param(float, 0.75,
                                           msg="fraction of training data used to make tree, rest used to set best sigma"),
@@ -73,7 +70,7 @@ class Inform_GPz_v1(CatInformer):
                           csl_method=Param(str, "normal", msg="cost sensitive learning type, 'balanced', 'normalized', or 'normal'"),
                           csl_binwidth=Param(float, 0.1, msg="width of bin for 'balanced' cost sensitive learning"),
                           pca_decorrelate=Param(bool, True, msg="if True, decorrelate data using PCA as preprocessing stage"),
-                          max_iter=Param(int, 200, msg="max number of iterations"),
+                          max_iter=Param(int, 100, msg="max number of iterations"),
                           max_attempt=Param(int, 50, msg="max iterations if no progress on validation"),
                           log_errors=Param(bool, True, msg="if true, take log of magnitude errors")
                           )
@@ -90,7 +87,7 @@ class Inform_GPz_v1(CatInformer):
         """
         if self.config.hdf5_groupname:
             training_data = self.get_data('input')[self.config.hdf5_groupname]
-        else:  #pragma:  no cover
+        else:  # pragma: no cover
             training_data = self.get_data('input')
         input_array = _prepare_data(training_data, self.config.bands, self.config.err_bands,
                                     self.config.nondetect_val, self.config.mag_lims,
@@ -106,7 +103,6 @@ class Inform_GPz_v1(CatInformer):
         val_mask = np.zeros(ngal, dtype=bool)
         train_mask[randvec[:ntrain]] = True
         val_mask[randvec[ntrain:]] = True
-        
 
         # get weights for cost sensitive learning
         omega_weights = getOmega(sz, method=self.config.csl_method)
@@ -122,7 +118,7 @@ class Inform_GPz_v1(CatInformer):
         model.train(input_array, sz, omega=omega_weights, training=train_mask,
                     validation=val_mask, maxIter=self.config.max_iter,
                     maxAttempts=self.config.max_attempt)
-        self.model=model
+        self.model = model
 
         self.add_data('model', self.model)
 
