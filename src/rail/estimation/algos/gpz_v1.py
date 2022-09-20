@@ -112,7 +112,8 @@ class Inform_GPz_v1(CatInformer):
                    method=self.config.gpz_method,
                    joint=self.config.learn_jointly,
                    heteroscedastic=self.config.hetero_noise,
-                   decorrelate=self.config.pca_decorrelate)
+                   decorrelate=self.config.pca_decorrelate,
+                   seed=self.config.seed)
 
         print("training model...")
         model.train(input_array, sz, omega=omega_weights, training=train_mask,
