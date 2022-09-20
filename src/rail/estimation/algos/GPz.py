@@ -6,26 +6,6 @@ import matplotlib.pyplot as plt
 import time
 
 
-def sample(n, trainSample, validSample, testSample):
-
-    if(trainSample<=1):
-        validSample = ceil(n * validSample)
-        testSample = ceil(n * testSample)
-        trainSample = min([ceil(n * trainSample), n - testSample - validSample])
-
-    r = random.permutation(n)
-
-    validation = zeros(n, dtype=bool)
-    testing = zeros(n, dtype=bool)
-    training = zeros(n, dtype=bool)
-
-    validation[r[0:int(validSample)]] = True
-    testing[r[int(validSample):int(validSample) + int(testSample)]] = True
-    training[r[int(validSample) + int(testSample):int(validSample) + int(testSample) + int(trainSample)]] = True
-
-    return training, validation, testing
-
-
 def getOmega(y, method='normal', binWidth=0):
 
     n = len(y)
@@ -52,43 +32,6 @@ def getOmega(y, method='normal', binWidth=0):
     else:
         return ones((n, 1))
 
-def metrics(y,mu,sigma,f):
-    n = len(y)
-    order = argsort(sigma,0)
-    y = y[order]
-    mu = mu[order]
-    sigma = sigma[order]
-
-    scores = cumsum(f(y,mu,sigma))
-    scores = array([scores[i]/(i+1) for i in range(n)])
-
-    return scores
-
-def bin(x,y,bins):
-
-    centers = linspace(min(x),max(x),bins)
-
-    D = Dxy(x,centers.reshape(bins,1))
-    ind = D.argmin(1)
-
-    counts = zeros(bins)
-    means = zeros(bins)
-    stds = zeros(bins)
-
-    for i in range(bins):
-        counts[i] = sum(ind==i)
-        if(counts[i]>0):
-            means[i] = mean(y[ind==i])
-            stds[i] = std(y[ind==i])
-
-    keep = counts>0
-
-    centers = centers[keep]
-    means = means[keep]
-    stds = stds[keep]
-
-    return centers,means,stds
-
 def Dxy(X, Y):
     x2 = sum(power(X, 2), 1)
     y2 = sum(power(Y, 2), 1).T
@@ -99,8 +42,10 @@ def Dxy(X, Y):
 
 class GP:
 
-    def __init__(self, m,method='GL', joint=True, heteroscedastic=True,decorrelate=False):
+    def __init__(self, m,method='GL', joint=True, heteroscedastic=True,decorrelate=False, seed=0):
 
+        self.seed = seed
+        self.rng = random.default_rng(seed=seed)
         self.m = m
         self.method = method
         self.joint = joint
@@ -162,7 +107,7 @@ class GP:
             PHI = Xt[training,:]
 
             for i in range(len(layers)-1):
-                W = (2*random.rand(layers[i],layers[i+1])-1)/sqrt(layers[i])
+                W = (2*self.rng.random(layers[i],layers[i+1])-1)/sqrt(layers[i])
                 theta[ind[i]:ind[i]+layers[i]*layers[i+1],0] = W.flatten()
                 PHI = tanh(dot(PHI,W))
 
@@ -174,9 +119,11 @@ class GP:
 
             pca4k = PCA(whiten=True)
             pca4k.fit(Xt[training, :])
-            P = pca4k.inverse_transform((random.rand(m, d) - 0.5)*sqrt(12))
+            # not sure why multipy by sqrt 12 (3.464) here?
+            rands = self.rng.random((m, d))
+            P = pca4k.inverse_transform((rands - 0.5) * 3.464)
 
-            gamma = sqrt(2*power(m,1./d) / mean(Dxy(X[training, :], P),0))
+            gamma = sqrt(2 * power(m, 1./d) / mean(Dxy(X[training, :], P), 0))
 
             if method == 'GL':
                 GAMMA = mean(gamma)
