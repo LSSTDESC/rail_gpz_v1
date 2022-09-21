@@ -172,7 +172,7 @@ class GP:
         self.maxAttempts=inf
 
     def train(self, X, Y, omega=None, training=None, validation=None, maxIter=200,maxAttempts=inf):
-        
+
         self.maxAttempts = maxAttempts
         self.attempts = 0
 
@@ -215,7 +215,6 @@ class GP:
         w, SIGMAi = fx(self.best_theta,Xt, Yt, omega,training, [], True)
         self.best_w = w
         self.best_SIGMAi = SIGMAi
-        fintime = time.time()
 
     def predict(self,X,model='best'):
 
