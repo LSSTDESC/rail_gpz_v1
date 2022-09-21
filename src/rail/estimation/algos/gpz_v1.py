@@ -8,6 +8,7 @@ from ceci.config import StageParameter as Param
 from rail.estimation.estimator import CatEstimator, CatInformer
 from .GPz import GP, getOmega
 import qp
+import time
 
 
 def_filt = ['u', 'g', 'r', 'i', 'z', 'y']
@@ -77,7 +78,7 @@ class Inform_GPz_v1(CatInformer):
 
     def __init__(self, args, comm=None):
         """ Constructor
-        Do CatInformer specific initialization, then check on bands """
+        Do CatInformer specific initialization"""
         CatInformer.__init__(self, args, comm=comm)
         self.zgrid = None
 
@@ -104,9 +105,10 @@ class Inform_GPz_v1(CatInformer):
         train_mask[randvec[:ntrain]] = True
         val_mask[randvec[ntrain:]] = True
 
+        preweight = time.time()
         # get weights for cost sensitive learning
         omega_weights = getOmega(sz, method=self.config.csl_method)
-
+        
         # initialize model
         model = GP(self.config.n_basis,
                    method=self.config.gpz_method,
@@ -120,7 +122,6 @@ class Inform_GPz_v1(CatInformer):
                     validation=val_mask, maxIter=self.config.max_iter,
                     maxAttempts=self.config.max_attempt)
         self.model = model
-
         self.add_data('model', self.model)
 
 
