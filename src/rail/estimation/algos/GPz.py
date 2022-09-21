@@ -186,7 +186,6 @@ class GP:
 
         if(self.not_initalized):
             self.init(X,Y,omega,training)
-
         if self.decorrelate:
             Xt = self.pca.transform(X)
         else:
@@ -202,9 +201,10 @@ class GP:
 
         self.iter = 1
         self.timer = time.time()
-        self.validLL = None
-
-        result= minimize(fx,self.theta,method='BFGS',jac=True,args=(Xt,Yt, omega, training, validation),callback=self.callbackF,options={'disp': False,'maxiter':maxIter})
+        self.validLL = None        
+        # result= minimize(fx,self.theta,method='BFGS',jac=True,args=(Xt,Yt, omega, training, validation),callback=self.callbackF,options={'disp': False,'maxiter':maxIter})
+        # switch to L-BFGS-B minimizer for huge speedup!
+        result= minimize(fx,self.theta,method='L-BFGS-B',jac=True,args=(Xt,Yt, omega, training, validation),callback=self.callbackF,options={'disp': False,'maxiter':maxIter})
 
         self.theta = result.x
         w, SIGMAi = fx(self.theta, Xt, Yt, omega,training, [], True)
@@ -213,7 +213,6 @@ class GP:
         self.SIGMAi = SIGMAi
 
         w, SIGMAi = fx(self.best_theta,Xt, Yt, omega,training, [], True)
-
         self.best_w = w
         self.best_SIGMAi = SIGMAi
 
@@ -662,7 +661,6 @@ class GP:
         return PHI,lnBeta,GAMMA,lnPHI
 
     def callbackF(self,theta):
-
         if (self.iter==1):
             if self.validLL is None:
                 print  ('{0:4s}\t{1:9s}\t\t{2:9s}\t\t{3:9s}\t\t{4:9s}'.format('Iter', ' logML/n', ' Train RMSE', ' Train MLL', ' Time'))

@@ -70,14 +70,14 @@ class Inform_GPz_v1(CatInformer):
                           csl_method=Param(str, "normal", msg="cost sensitive learning type, 'balanced', 'normalized', or 'normal'"),
                           csl_binwidth=Param(float, 0.1, msg="width of bin for 'balanced' cost sensitive learning"),
                           pca_decorrelate=Param(bool, True, msg="if True, decorrelate data using PCA as preprocessing stage"),
-                          max_iter=Param(int, 100, msg="max number of iterations"),
-                          max_attempt=Param(int, 50, msg="max iterations if no progress on validation"),
+                          max_iter=Param(int, 200, msg="max number of iterations"),
+                          max_attempt=Param(int, 100, msg="max iterations if no progress on validation"),
                           log_errors=Param(bool, True, msg="if true, take log of magnitude errors")
                           )
 
     def __init__(self, args, comm=None):
         """ Constructor
-        Do CatInformer specific initialization, then check on bands """
+        Do CatInformer specific initialization"""
         CatInformer.__init__(self, args, comm=comm)
         self.zgrid = None
 
@@ -120,7 +120,6 @@ class Inform_GPz_v1(CatInformer):
                     validation=val_mask, maxIter=self.config.max_iter,
                     maxAttempts=self.config.max_attempt)
         self.model = model
-
         self.add_data('model', self.model)
 
 
