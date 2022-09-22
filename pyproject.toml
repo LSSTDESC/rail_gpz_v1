@@ -1,5 +1,5 @@
 [project]
-name = "rail-gpz-v1"
+name = "pz-rail-gpz-v1"
 description = "RAIL GPz v1 (pure python) Interface"
 readme = "README.rst"
 requires-python = ">=3.8"
