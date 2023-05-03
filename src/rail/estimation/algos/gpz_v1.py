@@ -5,20 +5,11 @@ https://github.com/pwhatfield/GPz_py3
 """
 import numpy as np
 from ceci.config import StageParameter as Param
+from rail.core.common_params import SHARED_PARAMS
 from rail.estimation.estimator import CatEstimator, CatInformer
 from .GPz import GP, getOmega
 import qp
 
-
-def_filt = ['u', 'g', 'r', 'i', 'z', 'y']
-def_bands = [f"mag_{band}_lsst" for band in def_filt]
-def_err_bands = [f"mag_err_{band}_lsst" for band in def_filt]
-def_maglims = dict(mag_u_lsst=27.79,
-                   mag_g_lsst=29.04,
-                   mag_r_lsst=29.06,
-                   mag_i_lsst=28.62,
-                   mag_z_lsst=27.98,
-                   mag_y_lsst=27.05)
 
 
 def _prepare_data(data_dict, bands, err_bands, nondet_val, maglims, logflag):
@@ -32,7 +23,7 @@ def _prepare_data(data_dict, bands, err_bands, nondet_val, maglims, logflag):
     data = np.empty([totrows, 2 * numbands])
     for i, (band, eband, lim) in enumerate(zip(bands, err_bands, maglims.values())):
         data[:, i] = data_dict[band]
-        mask = np.isclose(data_dict[band], nondet_val)
+        mask = np.bitwise_or(np.isclose(data_dict[band], nondet_val), np.isnan(data_dict[band]))
         data[:, i][mask] = lim
         if logflag:
             data[:, numbands + i] = np.log(data_dict[eband])
@@ -55,14 +46,14 @@ class Inform_GPz_v1(CatInformer):
     """
     name = "Inform_GPz_v1"
     config_options = CatInformer.config_options.copy()
-    config_options.update(nondetect_val=Param(float, 99.0, msg="value to be replaced with magnitude limit for non detects"),
-                          mag_lims=Param(dict, def_maglims, msg="magnitude limits for each band"),
+    config_options.update(nondetect_val=SHARED_PARAMS,
+                          mag_limits=SHARED_PARAMS,
                           trainfrac=Param(float, 0.75,
                                           msg="fraction of training data used to make tree, rest used to set best sigma"),
-                          seed=Param(int, 0, msg="Random number seed for NN training"),
-                          bands=Param(list, def_bands, msg="bands to use in estimation"),
-                          err_bands=Param(list, def_err_bands, msg="error column names to use in estimation"),
-                          redshift_col=Param(str, "redshift", msg="name for redshift column"),
+                          seed=SHARED_PARAMS,
+                          bands=SHARED_PARAMS,
+                          err_bands=SHARED_PARAMS,
+                          redshift_col=SHARED_PARAMS,
                           gpz_method=Param(str, "VC", msg="method to be used in GPz, options are 'GL', 'VL', 'GD', 'VD', 'GC', and 'VC'"),
                           n_basis=Param(int, 50, msg="number of basis functions used"),
                           learn_jointly=Param(bool, True, msg="if True, jointly learns prior linear mean function"),
@@ -89,8 +80,9 @@ class Inform_GPz_v1(CatInformer):
             training_data = self.get_data('input')[self.config.hdf5_groupname]
         else:  # pragma: no cover
             training_data = self.get_data('input')
+
         input_array = _prepare_data(training_data, self.config.bands, self.config.err_bands,
-                                    self.config.nondetect_val, self.config.mag_lims,
+                                    self.config.nondetect_val, self.config.mag_limits,
                                     self.config.log_errors)
 
         sz = np.expand_dims(training_data[self.config.redshift_col], -1)
@@ -128,14 +120,14 @@ class GPz_v1(CatEstimator):
     """
     name = "GPz_v1"
     config_options = CatEstimator.config_options.copy()
-    config_options.update(zmin=Param(float, 0.0, msg="min z"),
-                          zmax=Param(float, 3.0, msg="max_z"),
-                          nzbins=Param(int, 301, msg="num z bins"),
-                          nondetect_val=Param(float, 99.0, msg="value to be replaced with magnitude limit for non detects"),
-                          mag_lims=Param(dict, def_maglims, msg="magnitude limits for each band"),
-                          bands=Param(list, def_bands, msg="bands to use in estimation"),
-                          err_bands=Param(list, def_err_bands, msg="error column names to use in estimation"),
-                          redshift_col=Param(str, "redshift", msg="name for redshift column"),
+    config_options.update(zmin=SHARED_PARAMS,
+                          zmax=SHARED_PARAMS,
+                          nzbins=SHARED_PARAMS,
+                          nondetect_val=SHARED_PARAMS,
+                          mag_limits=SHARED_PARAMS,
+                          bands=SHARED_PARAMS,
+                          err_bands=SHARED_PARAMS,
+                          ref_band=SHARED_PARAMS,
                           log_errors=Param(bool, True, msg="if true, take log of magnitude errors"))
 
     def __init__(self, args, comm=None):
@@ -147,7 +139,7 @@ class GPz_v1(CatEstimator):
     def _process_chunk(self, start, end, data, first):
         print(f"Process {self.rank} estimating GPz PZ PDF for rows {start:,} - {end:,}")
         test_array = _prepare_data(data, self.config.bands, self.config.err_bands,
-                                   self.config.nondetect_val, self.config.mag_lims,
+                                   self.config.nondetect_val, self.config.mag_limits,
                                    self.config.log_errors)
 
         mu, totalV, modelV, noiseV, _ = self.model.predict(test_array)
