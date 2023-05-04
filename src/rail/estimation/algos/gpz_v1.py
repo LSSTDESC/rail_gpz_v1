@@ -50,7 +50,7 @@ class Inform_GPz_v1(CatInformer):
                           mag_limits=SHARED_PARAMS,
                           trainfrac=Param(float, 0.75,
                                           msg="fraction of training data used to make tree, rest used to set best sigma"),
-                          seed=SHARED_PARAMS,
+                          seed=Param(int, 87, msg="random seed"),
                           bands=SHARED_PARAMS,
                           err_bands=SHARED_PARAMS,
                           redshift_col=SHARED_PARAMS,
