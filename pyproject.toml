@@ -28,6 +28,7 @@ dependencies = [
 [project.optional-dependencies]
 dev = [
     "qp-prob[full]",
+    "matplotlib",
     "coverage",
     "pylint",
     "pytest",
