@@ -21,12 +21,14 @@ classifiers = [
 dynamic = ["version"]
 dependencies = [
     "scikit-learn",
-    "pz-rail@git+https://github.com/LSSTDESC/RAIL.git@eac/minimal#egg=pz-rail",
+    "pz-rail-base",
     "qp-prob[full]",
 ]
 
 [project.optional-dependencies]
 dev = [
+    "qp-prob[full]",
+    "matplotlib",
     "coverage",
     "pylint",
     "pytest",
