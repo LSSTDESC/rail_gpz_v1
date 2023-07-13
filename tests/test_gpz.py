@@ -3,7 +3,7 @@ import os
 from rail.core.stage import RailStage
 from rail.core.algo_utils import one_algo
 from rail.core.utils import RAILDIR
-from rail.estimation.algos.gpz_v1 import GPzInformer, GPzEstimator
+from rail.estimation.algos.gpz import GPzInformer, GPzEstimator
 import scipy.special
 sci_ver_str = scipy.__version__.split(".")
 
