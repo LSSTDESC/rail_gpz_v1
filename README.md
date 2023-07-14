@@ -12,7 +12,7 @@ If subsequent versions of GPz with either improved features or faster performanc
 
 Any use of `rail_gpz_v1` in a paper or report should cite [Almosallam et al. 2016](https://ui.adsabs.harvard.edu/abs/2016MNRAS.462..726A/abstract)
 
-There are several free parameters that can be set via the `config_params` in `Inform_GPz_v1` that will be described in brief below, See [Almosallam et al. 2016](https://ui.adsabs.harvard.edu/abs/2016MNRAS.462..726A/abstract) for more details on the parameters, their meanings, and their effects :<br>
+There are several free parameters that can be set via the `config_params` in `GPzInformer` that will be described in brief below, See [Almosallam et al. 2016](https://ui.adsabs.harvard.edu/abs/2016MNRAS.462..726A/abstract) for more details on the parameters, their meanings, and their effects :<br>
 `gpz_method` (str): this parameter takes a str argument that sets how the length scale and covariance of the radial basis functions behave in the Gaussian process.  Valid options are `GL`, `VL`, `GD`, `VD`, `GC`, and `VC`, and give the following behavior:<br>
 - `GL`: "global length scale", all basis functions share a single length scale.<br>
 - `VL`: "variable length scale", each basis function has its own length scale.<br>

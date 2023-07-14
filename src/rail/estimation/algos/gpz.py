@@ -7,7 +7,7 @@ import numpy as np
 from ceci.config import StageParameter as Param
 from rail.core.common_params import SHARED_PARAMS
 from rail.estimation.estimator import CatEstimator, CatInformer
-from .GPz import GP, getOmega
+from ._gpz_util import GP, getOmega
 import qp
 
 
@@ -33,7 +33,7 @@ def _prepare_data(data_dict, bands, err_bands, nondet_val, maglims, logflag):
     return data
 
 
-class Inform_GPz_v1(CatInformer):
+class GPzInformer(CatInformer):
     """Inform stage for GPz_v1
     Parameters
     ----------
@@ -44,7 +44,7 @@ class Inform_GPz_v1(CatInformer):
       model file containing the trained GPz model to be used in estimate
       stage
     """
-    name = "Inform_GPz_v1"
+    name = "GPzInformer"
     config_options = CatInformer.config_options.copy()
     config_options.update(nondetect_val=SHARED_PARAMS,
                           mag_limits=SHARED_PARAMS,
@@ -115,10 +115,10 @@ class Inform_GPz_v1(CatInformer):
         self.add_data('model', self.model)
 
 
-class GPz_v1(CatEstimator):
-    """GPz_v1 estimator
+class GPzEstimator(CatEstimator):
+    """ Estimate stage for GPz_v1
     """
-    name = "GPz_v1"
+    name = "GPzEstimator"
     config_options = CatEstimator.config_options.copy()
     config_options.update(zmin=SHARED_PARAMS,
                           zmax=SHARED_PARAMS,
