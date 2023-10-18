@@ -14,7 +14,7 @@ DS = RailStage.data_store
 DS.__class__.allow_overwrite = True
 
 
-def test_gpz_v1():
+def test_gpz():
     train_config_dict = {"hdf5_groupname": "photometry", "max_iter": 30, "max_attempt": 25,
                          "model": "gpz_default.pkl"}
     estim_config_dict = {"hdf5_groupname": "photometry", "model": "gpz_default.pkl"}
