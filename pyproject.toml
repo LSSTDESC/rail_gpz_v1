@@ -119,7 +119,7 @@ testpaths = [
     "tests",
 ]
 addopts = [
-    "--cov=rail.estimation.algos.gpz",
+    "--cov=rail",
     "--cov-report=html"
 ]
 flake8-ignore = "E203"
