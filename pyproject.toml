@@ -31,8 +31,11 @@ dependencies = ["scikit-learn",
 dev = [
     "matplotlib",
     "coverage",
+    "flake8",
+    "mockmpi",
     "pytest",
     "pytest-cov", # Used to report total code coverage
+    "pytest-timeout",
     "pre-commit", # Used to run checks before finalizing a git commit
     "pylint", # Used for static linting of files
      "yamllint",
