@@ -1,47 +1,58 @@
 [project]
 name = "pz-rail-gpz-v1"
 description = "RAIL GPz v1 (pure python) Interface"
-readme = "README.rst"
 requires-python = ">=3.8"
-license = { file = "LICENSE" }
+license = {file = "LICENSE"}
+readme = "README.rst"
 authors = [
-    { name = "The LSST DESC PZ WG", email = "samuel.j.schmidt@gmail.com" }
+    { name = "LSST Dark Energy Science Collaboration (DESC)", email = "lsst-desc-rail-admin@slac.stanford.edu" }
 ]
 classifiers = [
     "Development Status :: 4 - Beta",
     "License :: OSI Approved :: MIT License",
     "Intended Audience :: Developers",
     "Intended Audience :: Science/Research",
+    "Operating System :: OS Independent",
     "Programming Language :: Python",
-    "Programming Language :: Python :: 3",
+     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3.9",
     "Natural Language :: English",
     "Operating System :: POSIX"
 ]
 dynamic = ["version"]
-dependencies = [
-    "scikit-learn",
-    "pz-rail-base",
-    "qp-prob[full]",
-]
 
+dependencies = ["scikit-learn",
+    "pz-rail-base",
+    "qp-prob[full]"
+    ]
+
+# On a mac, install optional dependencies with `pip install '.[dev]'` (include the single quotes)
 [project.optional-dependencies]
 dev = [
-    "qp-prob[full]",
     "matplotlib",
     "coverage",
-    "pylint",
     "pytest",
-    "pytest-cov",
-    "yamllint",
+    "pytest-cov", # Used to report total code coverage
+    "pre-commit", # Used to run checks before finalizing a git commit
+    "pylint", # Used for static linting of files
+     "yamllint",
 ]
 
 [build-system]
-requires = ["setuptools>=61", "wheel", "setuptools_scm[toml]>=6.2"]
+requires = [
+    "setuptools>=61", # Used to build and package the Python project
+    "wheel",
+    "setuptools_scm>=6.2", # Gets release version from git. Makes it available programmatically
+]
 build-backend = "setuptools.build_meta"
 
 [tool.setuptools_scm]
-write_to = "src/rail/gpz/_version.py"
+write_to = "src/rail/gpz_v1/_version.py"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+include = ["rail"]
+namespaces = true
 
 [tool.coverage.run]
 source = ["src/rail"]
@@ -92,7 +103,7 @@ disable = [
     "missing-class-docstring",
     "missing-function-docstring",
     "too-few-public-methods",
-    "duplicate-code"
+    "duplicate-code",
 ]
 max-line-length = 110
 max-locals = 50
@@ -104,8 +115,11 @@ profile = "black"
 line_length = 110
 
 [tool.pytest.ini_options]
+testpaths = [
+    "tests",
+]
 addopts = [
-    "--cov=rail.estimation.algos.gpz_v1",
+    "--cov=rail.estimation.algos.gpz",
     "--cov-report=html"
 ]
 flake8-ignore = "E203"
