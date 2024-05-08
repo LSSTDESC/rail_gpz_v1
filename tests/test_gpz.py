@@ -1,7 +1,7 @@
 import numpy as np
 import os
 from rail.core.stage import RailStage
-from rail.core.algo_utils import one_algo
+from rail.utils.testing_utils import one_algo
 from rail.utils.path_utils import RAILDIR
 from rail.estimation.algos.gpz import GPzInformer, GPzEstimator
 import scipy.special
