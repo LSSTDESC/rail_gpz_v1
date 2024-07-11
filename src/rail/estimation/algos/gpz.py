@@ -73,10 +73,10 @@ class GPzInformer(CatInformer):
                           replace_error_vals=Param(list, default_err_repl, msg="list of values to replace negative and nan mag err values")
                           )
 
-    def __init__(self, args, comm=None):
+    def __init__(self, args, **kwargs):
         """ Constructor
         Do CatInformer specific initialization"""
-        CatInformer.__init__(self, args, comm=comm)
+        super().__init__(self, args, **kwargs)
         self.zgrid = None
 
     def run(self):
@@ -144,10 +144,10 @@ class GPzEstimator(CatEstimator):
                           replace_error_vals=Param(list, default_err_repl, msg="list of values to replace negative and nan mag err values")
                           )
 
-    def __init__(self, args, comm=None):
+    def __init__(self, args, **kwargs):
         """ Constructor:
         Do CatEstimator specific initialization """
-        CatEstimator.__init__(self, args, comm=comm)
+        super().__init__(self, args, **kwargs)
         self.zgrid = None
         # check that lengths of bands, err_bands, and replace_error_vals match
         if not np.logical_and(len(self.config.bands) == len(self.config.err_bands),
