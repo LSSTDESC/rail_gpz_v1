@@ -76,7 +76,7 @@ class GPzInformer(CatInformer):
     def __init__(self, args, **kwargs):
         """ Constructor
         Do CatInformer specific initialization"""
-        super().__init__(self, args, **kwargs)
+        super().__init__(args, **kwargs)
         self.zgrid = None
 
     def run(self):
@@ -147,7 +147,7 @@ class GPzEstimator(CatEstimator):
     def __init__(self, args, **kwargs):
         """ Constructor:
         Do CatEstimator specific initialization """
-        super().__init__(self, args, **kwargs)
+        super().__init__(args, **kwargs)
         self.zgrid = None
         # check that lengths of bands, err_bands, and replace_error_vals match
         if not np.logical_and(len(self.config.bands) == len(self.config.err_bands),
