@@ -26,10 +26,10 @@ def _prepare_data(data_dict, bands, err_bands, nondet_val, maglims, logflag, rep
     data = np.empty([totrows, 2 * numbands])
     for i, (band, eband, lim, rplval) in enumerate(zip(bands, err_bands, maglims.values(), repl_err_vals)):
         data[:, i] = data_dict[band]
-        mask = np.bitwise_or(np.isclose(data_dict[band], nondet_val), np.isnan(data_dict[band]))
+        mask = np.bitwise_or(np.isclose(data_dict[band], nondet_val), ~np.isfinite(data_dict[band]))
         data[:, i][mask] = lim
         errband = data_dict[eband]
-        emask = np.bitwise_or(errband <= 0., np.isnan(errband))
+        emask = np.bitwise_or(errband <= 0., ~np.isfinite(errband))
         errband[emask] = rplval
         if logflag:
             data[:, numbands + i] = np.log(errband)
