@@ -161,7 +161,7 @@ class GPzEstimator(CatEstimator):
                                    self.config.log_errors, self.config.replace_error_vals)
 
         mu, totalV, modelV, noiseV, _ = self.model.predict(test_array)
-        ens = qp.Ensemble(qp.stats.norm, data=dict(loc=mu, scale=totalV))
+        ens = qp.Ensemble(qp.stats.norm, data=dict(loc=mu, scale=np.sqrt(totalV)))
         zgrid = np.linspace(self.config.zmin, self.config.zmax, self.config.nzbins)
         zmode = ens.mode(grid=zgrid)
         ens.set_ancil(dict(zmode=zmode))
