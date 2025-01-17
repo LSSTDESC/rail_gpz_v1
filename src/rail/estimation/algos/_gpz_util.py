@@ -450,7 +450,9 @@ class GP:
 
         lnBeta = lnBeta+log(omega[training,:])
 
-        if Y==[]:
+        # if Y==[]:  #  NOTE: checking empty array now deprecated, switch to checking size!
+        # change made Jan 17, 2025 to fix a failure
+        if size(Y) == 0:
             return PHI,lnBeta
 
         g_dim = len(GAMMA.flatten())
