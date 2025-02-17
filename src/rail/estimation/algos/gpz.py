@@ -41,14 +41,7 @@ def _prepare_data(data_dict, bands, err_bands, nondet_val, maglims, logflag, rep
 
 class GPzInformer(CatInformer):
     """Inform stage for GPz_v1
-    Parameters
-    ----------
 
-    Returns
-    -------
-    gpz_model: model
-      model file containing the trained GPz model to be used in estimate
-      stage
     """
     name = "GPzInformer"
     config_options = CatInformer.config_options.copy()
