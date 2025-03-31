@@ -63,7 +63,7 @@ class GPzInformer(CatInformer):
                           max_iter=Param(int, 200, msg="max number of iterations"),
                           max_attempt=Param(int, 100, msg="max iterations if no progress on validation"),
                           log_errors=Param(bool, True, msg="if true, take log of magnitude errors"),
-                          replace_error_vals=Param(list, default_err_repl, msg="list of values to replace negative and nan mag err values")
+                          replace_error_vals=SHARED_PARAMS,
                           )
 
     def __init__(self, args, **kwargs):
@@ -84,7 +84,11 @@ class GPzInformer(CatInformer):
         # check that lengths of bands, err_bands, and replace_error_vals match
         if not np.logical_and(len(self.config.bands) == len(self.config.err_bands),
                               len(self.config.err_bands) == len(self.config.replace_error_vals)):  # pragma: no cover
-            raise ValueError("lengths of bands, err_bands, and replace_error_vals do not match!")
+            raise ValueError(
+                f"lengths of bands {len(self.config.bands)}, "
+                f"err_bands {len(self.config.bands)}, "
+                f"and replace_error_vals {len(self.config.replace_error_vals)} do not match!"
+            )
 
         input_array = _prepare_data(training_data, self.config.bands, self.config.err_bands,
                                     self.config.nondetect_val, self.config.mag_limits,
@@ -134,7 +138,7 @@ class GPzEstimator(CatEstimator):
                           err_bands=SHARED_PARAMS,
                           ref_band=SHARED_PARAMS,
                           log_errors=Param(bool, True, msg="if true, take log of magnitude errors"),
-                          replace_error_vals=Param(list, default_err_repl, msg="list of values to replace negative and nan mag err values")
+                          replace_error_vals=SHARED_PARAMS,
                           )
 
     def __init__(self, args, **kwargs):
@@ -145,7 +149,11 @@ class GPzEstimator(CatEstimator):
         # check that lengths of bands, err_bands, and replace_error_vals match
         if not np.logical_and(len(self.config.bands) == len(self.config.err_bands),
                               len(self.config.err_bands) == len(self.config.replace_error_vals)):  # pragma: no cover
-            raise ValueError("lengths of bands, err_bands, and replace_error_vals do not match!")
+             raise ValueError(
+                f"lengths of bands {len(self.config.bands)}, "
+                f"err_bands {len(self.config.bands)}, "
+                f"and replace_error_vals {len(self.config.replace_error_vals)} do not match!"
+            )
 
     def _process_chunk(self, start, end, data, first):
         print(f"Process {self.rank} estimating GPz PZ PDF for rows {start:,} - {end:,}")
