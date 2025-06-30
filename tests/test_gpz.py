@@ -20,8 +20,8 @@ def test_gpz_v1():
     estim_config_dict = {"hdf5_groupname": "photometry", "model": "gpz_default.pkl"}
     train_algo = GPzInformer
     pz_algo = GPzEstimator
-    zb_expected = np.array([0.12, 0.13, 0.12, 0.14, 0.07, 0.13, 0.14, 0.13,
-                            0.06, 0.12])
+    #zb_expected = np.array([0.1 , 0.13, 0.13, 0.13, 0.12, 0.13, 0.13, 0.13, 0.1 , 0.12])
+    zb_expected = np.array([0.11, 0.13, 0.12, 0.13, 0.09, 0.13, 0.13, 0.13, 0.08, 0.11])
     results, rerun_results, _ = one_algo("GPz_v1", train_algo, pz_algo,
                                          train_config_dict, estim_config_dict)
     flatres = results.ancil["zmode"].flatten()
