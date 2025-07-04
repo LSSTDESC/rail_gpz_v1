@@ -166,4 +166,4 @@ class GPzEstimator(CatEstimator):
         zgrid = np.linspace(self.config.zmin, self.config.zmax, self.config.nzbins)
         zmode = ens.mode(grid=zgrid)
         ens.set_ancil(dict(zmode=zmode))
-        self._do_chunk_output(ens, start, end, first)
+        self._do_chunk_output(ens, start, end, first, data=data)
