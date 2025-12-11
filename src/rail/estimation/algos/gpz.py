@@ -51,6 +51,7 @@ class GPzInformer(CatInformer):
 
     name = "GPzInformer"
     entrypoint_function = "inform"  # the user-facing science function for this class
+    interactive_function = "gpz_informer"
     config_options = CatInformer.config_options.copy()
     config_options.update(
         nondetect_val=SHARED_PARAMS,
@@ -174,6 +175,7 @@ class GPzEstimator(CatEstimator):
 
     name = "GPzEstimator"
     entrypoint_function = "estimate"  # the user-facing science function for this class
+    interactive_function = "gpz_estimator"
     config_options = CatEstimator.config_options.copy()
     config_options.update(
         zmin=SHARED_PARAMS,
