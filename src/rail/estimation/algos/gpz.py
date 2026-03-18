@@ -56,7 +56,7 @@ class GPzInformer(CatInformer):
     config_options.update(
         nondetect_val=SHARED_PARAMS,
         mag_limits=SHARED_PARAMS,
-        trainfrac=Param(
+        train_frac=Param(
             float,
             0.75,
             msg="fraction of training data used to make tree, rest used to set best sigma",
@@ -136,7 +136,7 @@ class GPzInformer(CatInformer):
         # need permutation mask to define training vs validation
         ngal = input_array.shape[0]
         print(f"ngal: {ngal}")
-        ntrain = int(ngal * self.config.trainfrac)
+        ntrain = int(ngal * self.config.train_frac)
         randvec = np.random.permutation(ngal)
         train_mask = np.zeros(ngal, dtype=bool)
         val_mask = np.zeros(ngal, dtype=bool)
