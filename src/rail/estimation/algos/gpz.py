@@ -135,7 +135,7 @@ class GPzInformer(CatInformer):
         sz = np.expand_dims(training_data[self.config.redshift_col], -1)
         # need permutation mask to define training vs validation
         ngal = input_array.shape[0]
-        print(f"ngal: {ngal}")
+        self.log.info(f"ngal: {ngal}")
         ntrain = int(ngal * self.config.train_frac)
         randvec = np.random.permutation(ngal)
         train_mask = np.zeros(ngal, dtype=bool)
@@ -156,7 +156,7 @@ class GPzInformer(CatInformer):
             seed=self.config.seed,
         )
 
-        print("training model...")
+        self.log.info("training model...")
         model.train(
             input_array,
             sz,
@@ -207,7 +207,7 @@ class GPzEstimator(CatEstimator):
             )
 
     def _process_chunk(self, start, end, data, first):
-        print(f"Process {self.rank} estimating GPz PZ PDF for rows {start:,} - {end:,}")
+        self.log.info(f"Process {self.rank} estimating GPz PZ PDF for rows {start:,} - {end:,}")
         test_array = _prepare_data(
             data,
             self.config.bands,
